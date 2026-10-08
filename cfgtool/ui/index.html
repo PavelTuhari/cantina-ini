@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Настройка кассы UAMenu</title>
+<link rel="stylesheet" href="/ui/styles.css">
+</head>
+<body>
+
+<header>
+  <h1>Настройка кассы UAMenu</h1>
+  <div class="path" id="filePath">…</div>
+  <nav>
+    <a href="#settings" data-tab="settings">Настройки</a>
+    <a href="#checks" data-tab="checks">Проверка</a>
+    <a href="#buttons" data-tab="buttons">Кнопки тачскрина</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ Настройки ============ -->
+  <section id="tab-settings" hidden>
+    <div class="stats" id="stats"></div>
+
+    <div class="card">
+      <div class="toolbar">
+        <input type="search" id="search" placeholder="Найти параметр или слово в пояснении"
+               style="flex: 1 1 280px">
+        <select id="groupPick"><option value="">Все подсистемы</option></select>
+        <select id="statePick">
+          <option value="">Любое состояние</option>
+          <option value="действует">действует</option>
+          <option value="не читается">не читается</option>
+          <option value="мёртвая">мёртвая</option>
+        </select>
+        <label style="font-size:13px;color:var(--ink2)">
+          <input type="checkbox" id="showAbsent"> показать и не указанные в файле
+        </label>
+      </div>
+      <div id="optCount" class="hint"></div>
+      <div id="options"></div>
+    </div>
+  </section>
+
+  <!-- ============ Проверка ============ -->
+  <section id="tab-checks" hidden>
+    <div id="checks"></div>
+  </section>
+
+  <!-- ============ Кнопки тачскрина ============ -->
+  <section id="tab-buttons" hidden>
+    <div id="tsError"></div>
+
+    <div class="card" id="tsControls" hidden>
+      <div class="toolbar">
+        <label style="font-size:12px;color:var(--mute)">Панель
+          <select id="panelPick"></select>
+        </label>
+        <label style="font-size:12px;color:var(--mute)">Слой
+          <select id="layerPick"></select>
+        </label>
+        <label style="font-size:12px;color:var(--mute)">Язык
+          <select id="lngPick"></select>
+        </label>
+        <span id="pageNav"></span>
+        <span style="flex:1"></span>
+        <span id="pendingBox" class="pending"></span>
+      </div>
+      <div id="panelInfo" class="hint"></div>
+    </div>
+
+    <div class="ts-layout" id="tsLayout" hidden>
+      <div class="card">
+        <h2>Раскладка так, как её видит кассир</h2>
+        <p class="about">
+          Ячейки идут слева направо, сверху вниз. Кнопку можно перетащить в
+          другую ячейку мышью, щёлкнуть — чтобы поправить подпись или команду.
+        </p>
+        <div class="ts-grid" id="tsGrid"></div>
+        <div class="hint" id="gridHint"></div>
+      </div>
+
+      <div class="card ts-side">
+        <h2>Кнопка</h2>
+        <div id="tsEditor"><p class="empty-note">Выберите кнопку в сетке.</p></div>
+      </div>
+    </div>
+
+    <div class="card" id="tsDiag" hidden>
+      <h2>Кнопки, которые ничего не сделают</h2>
+      <p class="about">
+        Команда записана в базе, но касса её не разбирает: в
+        <code>TS.cpp</code> такого имени нет. Нажатие просто ничего не даст,
+        и ошибки тоже не будет.
+      </p>
+      <div id="unsupported"></div>
+    </div>
+  </section>
+
+</main>
+
+<script src="/ui/app.js"></script>
+</body>
+</html>

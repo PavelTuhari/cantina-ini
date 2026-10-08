@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Установка и настройка кассы</title>
+<style>
+:root{--paper:#f3f5f7;--card:#fff;--ink:#17212b;--ink2:#4c5b68;--mute:#7e8c99;
+--rule:#dae1e7;--rule2:#eaeff3;--acc:#1a5f7f;--acc2:#e3eef4;--ok:#1b6b45;
+--ok2:#e2f0e8;--bad:#93301f;--bad2:#f8e7e3;--warn:#8a5a12;--warn2:#f7efdc;
+--orig:#fbfaf7;--origrule:#e6e0d2}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+--paper:#0d1418;--card:#141d23;--ink:#e3ecf1;--ink2:#b0c0cb;--mute:#7e8c99;
+--rule:#25333b;--rule2:#1c272d;--acc:#61c2d8;--acc2:#11303a;--ok:#63c795;
+--ok2:#122d22;--bad:#e58a78;--bad2:#351c17;--warn:#dda75a;--warn2:#32250f;
+--orig:#141a1d;--origrule:#2c3339}}
+:root[data-theme=dark]{--paper:#0d1418;--card:#141d23;--ink:#e3ecf1;
+--ink2:#b0c0cb;--mute:#7e8c99;--rule:#25333b;--rule2:#1c272d;--acc:#61c2d8;
+--acc2:#11303a;--ok:#63c795;--ok2:#122d22;--bad:#e58a78;--bad2:#351c17;
+--warn:#dda75a;--warn2:#32250f;--orig:#141a1d;--origrule:#2c3339}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font:16px/1.62 "Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px 90px}
+header{padding:52px 0 24px;border-bottom:1px solid var(--rule)}
+.eyebrow{font:600 11.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.15em;
+text-transform:uppercase;color:var(--mute);margin:0 0 14px}
+h1{font:700 clamp(27px,4.4vw,40px)/1.08 "Segoe UI",sans-serif;
+letter-spacing:-.02em;margin:0 0 12px;text-wrap:balance}
+.lede{font-size:17.5px;color:var(--ink2);max-width:70ch;margin:0 0 20px}
+.meta{display:flex;flex-wrap:wrap;gap:1px;background:var(--rule);
+border:1px solid var(--rule);border-radius:4px;overflow:hidden;margin:0 0 20px}
+.meta div{flex:1 1 160px;background:var(--card);padding:12px 15px}
+.meta b{display:block;font:700 20px/1.2 "Segoe UI",sans-serif;
+font-variant-numeric:tabular-nums}
+.meta span{font-size:12px;color:var(--mute)}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px 8px;margin:20px 0 0}
+nav.toc a{font:12.5px ui-monospace,Consolas,monospace;color:var(--ink2);
+text-decoration:none;border:1px solid var(--rule);border-radius:3px;
+padding:6px 11px;background:var(--card)}
+nav.toc a:hover{border-color:var(--acc);color:var(--acc)}
+section{margin:48px 0 0;scroll-margin-top:16px}
+h2{font:600 13px/1 "Segoe UI",sans-serif;letter-spacing:.11em;
+text-transform:uppercase;color:var(--acc);margin:0 0 16px;padding-bottom:10px;
+border-bottom:2px solid var(--acc)}
+h3{font:600 17.5px/1.3 "Segoe UI",sans-serif;margin:26px 0 10px;
+letter-spacing:-.01em}
+p{max-width:74ch;color:var(--ink2)}
+p.tight{margin:6px 0}
+code{font:13px ui-monospace,Consolas,monospace;background:var(--acc2);
+color:var(--acc);padding:1px 5px;border-radius:3px}
+pre{background:#10191e;color:#d6e2ea;font:12.5px/1.6 ui-monospace,Consolas,monospace;
+padding:14px 16px;border-radius:4px;overflow-x:auto}
+pre code{background:none;color:inherit;padding:0}
+.orig{background:var(--orig);border:1px solid var(--origrule);
+border-left:3px solid var(--mute);border-radius:0 4px 4px 0;
+padding:4px 20px 12px;margin:14px 0}
+.orig .src{font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;
+text-transform:uppercase;color:var(--mute);margin:12px 0 10px}
+.orig p{color:var(--ink)}
+.orig ol{padding-left:24px}
+/* Нумерация исходной инструкции сохраняется своя: на неё же ссылаются
+   внутри текста («см. примечание 3*»), поэтому автоматическую убираем. */
+.orig ol.asis{list-style:none;padding-left:0}
+.orig ol.asis > li{padding-left:2.2em;text-indent:-2.2em}
+.orig li{margin-bottom:9px;color:var(--ink)}
+.orig li ol{margin-top:7px}
+.orig pre{background:#0e1519}
+.add{border-left:3px solid var(--acc);background:var(--acc2);
+border-radius:0 4px 4px 0;padding:4px 18px 12px;margin:16px 0}
+.add .src{font:600 10.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;
+text-transform:uppercase;color:var(--acc);margin:12px 0 8px}
+.add p{color:var(--ink)}
+.warnbox{border-left:3px solid var(--warn);background:var(--warn2);
+border-radius:0 4px 4px 0;padding:12px 16px;margin:16px 0;color:var(--ink)}
+.badbox{border-left:3px solid var(--bad);background:var(--bad2);
+border-radius:0 4px 4px 0;padding:12px 16px;margin:16px 0;color:var(--ink)}
+.wrapt{overflow-x:auto;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card);
+border:1px solid var(--rule);border-radius:4px}
+th{text-align:left;font:600 11px/1 ui-monospace,Consolas,monospace;
+letter-spacing:.07em;text-transform:uppercase;color:var(--mute);
+padding:10px 12px;border-bottom:2px solid var(--rule);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--rule2);vertical-align:top;
+font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right;white-space:nowrap}
+td code{font-size:12.5px}
+.pill{display:inline-block;font:600 10px/1 ui-monospace,Consolas,monospace;
+letter-spacing:.07em;padding:3px 7px;border-radius:3px}
+.p-ok{background:var(--ok2);color:var(--ok)}
+.p-bad{background:var(--bad2);color:var(--bad)}
+.p-warn{background:var(--warn2);color:var(--warn)}
+ul.plain{margin:8px 0;padding-left:22px;color:var(--ink2)}
+ul.plain li{margin-bottom:6px}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--rule);
+color:var(--mute);font-size:13.5px}
+footer a{color:var(--acc)}
+a{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<p class="eyebrow">Вики UNA · install_conf_serverCassa · с дополнениями</p>
+<h1>Установка и настройка кассы</h1>
+<p class="lede">Инструкция по установке кассовой схемы, программы и оборудования версии 2.10 от 28 января 2010 года, приведённая полностью, и то, что за пятнадцать лет с ней разошлось.</p>
+<div class="meta">
+<div><b>55</b><span>шагов в исходной инструкции</span></div>
+<div><b>6</b><span>параметров названо в ней</span></div>
+<div><b>862</b><span>параметра касса читает сегодня</span></div>
+<div><b>2010</b><span>год последней правки</span></div>
+</div>
+<nav class="toc">
+<a href="#ishodnik">Инструкция как есть</a>
+<a href="#segodnya">Что изменилось с 2010 года</a>
+<a href="#instrument">Чем это настраивать сегодня</a>
+</nav>
+</header>
+<section id="ishodnik"><h2>Инструкция как есть</h2>
+<p>Страница приведена полностью, слово в слово. Ничего не выброшено и не переписано: это текст заказчика.</p>
+<div class="orig"><p class="src">Исходный текст страницы</p>
+<p>Примерный перечень действий для установки и настройки кассовой программы.</p>
+<p>Инструкция составлялась по результатм внедрения, начиная с сети “Linella”, и последующих доработок, поэтому может не учитывать особенностей установки, настройки и функционирования кассовой программы в отличных от описываемых условиях. Требуется проверка, уточненение, дополнение...</p>
+<p>v. 2.10</p>
+<p>28-01-2010</p>
+<h3>Предварительные условия.</h3>
+<ol class="asis">
+<li><b>1.</b> Необходимо наличие бухгалтерской схемы.
+<li><b>2.</b> На кассовых серверах очень желательно наличие возможности одновременной удалённой работы нескольких пользователей (или возможность подключения при помощи RAdmin, VNC и т.п.).
+<li><b>3.</b> На одном из кассовых серверов необходимо наличие дистрибутивов используемого ПО
+<br>(Oracle Client, CoreFiles, Good/UAMnenu, QLoad, uniaccFileCopy, программа для разблокировки к.а.), а также документации для используемого оборудования (к.а., сканеры, весы).
+<li><b>4.</b> Требуемая кодировка БД – CL8MSWIN1251
+<br>(select value from nls_database_parameters where parameter = 'NLS_CHARACTERSET').
+<br>Изменение кодировки для Oracle XE – см. примечание 5*.
+<li><b>5.</b> Параметр global_names на всех БД должен быть установлен в true.
+<li><b>6.</b> Имена БД на кассовых серверах (select global_name from global_name) должны быть уникальными.
+<br>В случае необходимости можно изменить: alter database rename global_name to name.domain.
+<li><b>7.</b> Стабильная связь между бухгалтерской и кассовой схемой. (В случае проблем с VPN-соединениями см. примечание 1*)
+<li><b>8.</b> В случае использования весов желательно заранее подготовить файлы настроек, необходимые для загрузки в весы (этикетка, название магазина, текстовые комментарии). Содержимое файла с названием магазина для весов DIGI (F52) можно сформировать при помощи функции make_f52_shop_name из пакета Unirest_Util.
+</ol>
+<h3>Установка кассовой схемы. Настройки на стороне БД.</h3>
+<ol class="asis">
+<li><b>9.</b> Установить кассовую схему.
+<br><span style='color:var(--mute)'>1) </span>Создать tablespaces (Good\Script\Sys\sys_Tablespaces.sql), подправив скрипт по необходимости (пути, размеры).
+<br><span style='color:var(--mute)'>2) </span>Создать пользователя un4public (Good\Script\un4public\un4public.sql).
+<br><span style='color:var(--mute)'>3) </span>Создать пользователя unirest_public (unirest_public.sql).
+<br><span style='color:var(--mute)'>4) </span>Создать пользователя кассы (кассовую схему - create_user.sql).
+<br><span style='color:var(--mute)'>5) </span>Импортировать дамп кассовой схемы.
+<br>...
+<li><b>10.</b> Настроить tnsnames на бухгалтерском сервере.
+<li><b>11.</b> Настроить tnsnames на кассовом сервере.
+<li><b>12.</b> Создать необходимые db link'и в бухгалтерской схеме.
+<li><b>13.</b> Создать db link к бухгалтерской схеме  (если она на другой базе).
+<li><b>14.</b> В бухгалтерской схеме необходимо заполнить талбицу с настройками связи с кассой(кассами) - ybmb_dif_cassa.
+<li><b>15.</b> В бухгалтерской схеме заполнить спарвочники кассиров, справочник касс, справочник весов и типов весов, произвести привязку касс к магазинам (в карточке кассы).
+<li><b>16.</b> В кассовой программе заполнить справочник кассиров (tms_casir).
+<li><b>17.</b> Настроить в кассовой схеме параметры в tms_init_params.
+<br>Обязательно:
+<br><span style='color:var(--mute)'>1) </span>Schema - имя бухгалтерской схемы
+<br><span style='color:var(--mute)'>2) </span>DBLink - линк к бухгалтерской схеме (если она на другой базе).
+<br><span style='color:var(--mute)'>3) </span>GlobalDep – код подразделения, к которому относятся работающие на кассовом сервере кассы
+<br><span style='color:var(--mute)'>4) </span>ServerID – порядковый номер сервера в рамках всей организации
+<li><b>18.</b> Настроить в таблице object_list соответствие м/у объектами кассовой и бухгалтерской схем. Описание механизма fast refresh, который можно использовать для обновления справочников наряду с complete refresh, его настройки в object_list, плюсы/минусы - в Примечании 4*.
+<li><b>19.</b> В случае использования для обновления справочников механизма fast refresh необходимо создать логи для соответствующих на бухгалтерской схеме - create materialized view log on &lt;table name&gt;.
+<li><b>20.</b> Создать триггер on logon on schema (trg_on_logon) (для инициализации контекстов) и переподключиться к кассовой схеме (в новых версиях - &gt;= 01.01.2008 не нужно, инициализация и созадение триггера производится перед созданием объектов в call_all_mv_v).
+<li><b>21.</b> Запустить unirest_mv_v.call_all_mv_v. Эта процедура создаёт на основе данных из object_list необходимые объекты (синонимы, view, mat.view и т.д.).
+<li><b>22.</b> Откомпилировать инвалидные объекты (можно при помощи dbms_utility.compile_schema(user,false)), в новых версиях - &gt;= 01.03.2009 не нужно, компиляция производится после создания объектов в call_all_mv_v.
+<li><b>23.</b> Настроить архивацию (backup) для кассовой схемы.
+</ol>
+<h3>Установка, настройка и проверка кассовой программы.</h3>
+<ol class="asis">
+<li><b>24.</b> Скопировать нужную версию UAMenu + CoreFiles (или Good).
+<li><b>25.</b> Скопировать cantina.ini в %windir% или в папку с программой. (см. примечание 2*)
+<br>Настроить необходимые параметры:
+<br><span style='color:var(--mute)'>1) </span>Server (обязательно) - имя сервера с кассовой схемой.
+<br><span style='color:var(--mute)'>2) </span>FiscalPrinter - тип используемого кассовго аппарата.
+<br><span style='color:var(--mute)'>3) </span>PosID или CassaDatecsNrLogic - номер кассы (попадает в tmdb_sold.id_cassa). См. примечание 3*
+<br><span style='color:var(--mute)'>4) </span>ImageBackGroundPath (опционально ) - путь к логотипу для основного окна программы.
+<br><span style='color:var(--mute)'>5) </span>BonDir - каталог формирования чеков для TextSell (В случае FiscalPrinter=Datecs)  или FPRWIN (ElicomECR).
+<br><span style='color:var(--mute)'>6) </span>...
+<li><b>26.</b> Проверить запуск UAMenu.
+<li><b>27.</b> В UAMenu выполнить "Работа с БД --&gt; Обновить справочники с сервера"  (обновление mat.view).
+<li><b>28.</b> Временно установить в cantina.ini параметр BonFiscal в false  (на время проверки).
+<li><b>29.</b> Провести в кассовой программе операцию продажи товара.
+<li><b>30.</b> Установить в cantina.ini параметр BonFiscal в true.
+<li><b>31.</b> Проверить в бухгалтерской программе наличие данных по проданным товарам и возможность создания по ним документов. (Журналы -&gt; Товары -&gt; Расход ...). Тестовые докуметны после проверки удалить.
+<li><b>32.</b> Почистить тестовые данные в кассовой схеме. (delete/truncate)
+<br><span style='color:var(--mute)'>1) </span>tmdb_fiscal_notes
+<br><span style='color:var(--mute)'>2) </span>tmdb_sync_log
+<br><span style='color:var(--mute)'>3) </span>tmdb_comenz
+<br><span style='color:var(--mute)'>4) </span>log_tmdb_comenzd
+<br><span style='color:var(--mute)'>5) </span>cass_log
+<br><span style='color:var(--mute)'>6) </span>tmdb_sold
+<br><span style='color:var(--mute)'>7) </span>txzlog
+<br><span style='color:var(--mute)'>8) </span>pptable
+<li><b>33.</b> Сбросить sequences в кассовой схеме (опционально) - comenz, sec_comenzd, seq_comenzd_t, seq_txzlog, id_payments, id_pptable.
+<li><b>34.</b> Сменить пароль администратора, используемого по умолчанию, для того чтобы было невозможно использовать комбинацию клавиш Ctrl+F12.
+</ol>
+<h3>Настройки ОС и вспомогательных утилит.</h3>
+<ol class="asis">
+<li><b>35.</b> Создать пользователя ОС, под которым будут работать кассиры (если такового нет).
+<li><b>36.</b> Отключить кэширование записи на диск на уровне ОС:
+<br>Disk drive properties-&gt;Policies-&gt;Optimize for quick removal
+<li><b>37.</b> В случае использования Win2003 – уменьшить размер файлового кэша ОС:
+<br>Network connection properties-&gt; General-&gt;File and Printer Sharing for Microsoft Networks-&gt;Properties-&gt;Maximize data throughput for network applications
+<li><b>38.</b> Дать права на запись в папку с программой для пользователя-кассира (иначе не будут вестись логи работы программы).
+<li><b>39.</b> Скопировать ярлык UAMenu на рабочий стол кассира и в автозагрузку.
+<li><b>40.</b> Создать бат-файл для копирования измененной версии UAMenu с кассового сервера на другие кассовые компьютеры (при наличии таковых).
+<li><b>41.</b> В случае использования к.а. DatecsFP550 скопировать программы FPWIN и FPTax для диагностики фискальных принтеров администратором (при необходимости печати клиентом Z-отчётов за прошедшие дни, создать ярлыки на рабочем столе кассира), создать ярлык для программы разблокирования фискального принтера на рабочем столе кассира.
+<li><b>42.</b> Если в UAMenu некорректно отображаются кириллические сообщения об ошибках (можно проверить, например, набрав неправильный пароль), то необходимо проверить настройку серверных и клиентских NLS - параметров:
+<br><span style='color:var(--mute)'>1) </span>Ключ NLS_LANG в Oracle Home
+<br>(HKEY_LOCAL_MACHINE\SOFTWARE\ORACLE\KEY_&lt;OracleHomeName&gt;)
+<br><span style='color:var(--mute)'>2) </span>Переменная окружения NLS_LANG
+<br><span style='color:var(--mute)'>3) </span>nls_database_parameters / nls_session_parameters
+<br>За подробностями - в Metalink Note:158577.1 и далее по ссылкам или Oracle® Database Globalization Support Guide - Setting Up a Globalization Support Environment
+<br>http://download.oracle.com/docs/cd/B19306_01/server.102/b14225/ch3globenv.htm
+<br>Если настройка NLS-параметров не помогла, то можно изменить в ветке HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Nls\CodePage значение параметров 1250 и 1252 на c_1251.nls (необходима перезагрузка).
+</ol>
+<h3>Настройки и проверка оборудования и сопутствующего ПО.</h3>
+<ol class="asis">
+<li><b>43.</b> Настроить сканеры штрих-кодов (проверить наличие префикса и работу с программой).
+<li><b>44.</b> Настроить сканеры, в случае необходимости, для расширения штрих-кодов до EAN13.
+<li><b>45.</b> Настроить печать на кассовые аппараты в зависимости от модели аппарата (параметр FiscalPrinter в cantina.ini).
+<br><span style='color:var(--mute)'>1) </span>FiscalPrinter=Datecs   (для Datecs MP-500/ Datecs MP-5000)
+<li><b>1.</b> 1   Установить программу для печати на кассовый аппарат. TextSell2035.
+<li><b>1.</b> 2   Прописать в автозагрузку пользователям, которые будут работать с кассой ярлыки для программы печати на к.а. (для текущего пользователя они прописываются при установке программы).
+<li><b>1.</b> 3  В Casyst.ini прописать ключи для кассовых аппаратов. (после изменения ключей перезапустить программу печати).
+<li><b>1.</b> 4   Проверить настройку параметров PosID и CassaDatecsNrLogic (см. примечание 3*).
+<br><span style='color:var(--mute)'>2) </span>FilcalPrinter=DatecsFP550  (для Datecs FP550)
+<li><b>2.</b> 1 Скопировать Wtdedit.dll в Windows\System32s
+<li><b>2.</b> 2 Зарегистрировать dll - "regsvr32 wtdedit.dll" - регистрация COM-объекта.
+<li><b>2.</b> 3 В cantina.ini установить COMBaudRate = 9600
+<br><span style='color:var(--mute)'>3) </span>FilcalPrinter=IKC_E260T   (для IKC-E260T)
+<li><b>3.</b> 1 Скопировать IKC_E260T02.dll в Windows\System32
+<br><span style='color:var(--mute)'>4) </span>FiscalPrinter=IKC_E260T_RTI (для IKC-E260T)
+<li><b>4.</b> 1 Скопировать IKC_E260T_driver.dll в Windows\System32
+<li><b>4.</b> 2 Установить Microsoft Visual C++ 2005 Redistributable Package (x86) (vcredist_x86.exe), который     включает в себя библиотеки msvcp80.dll и msvcr80.dll, нужные для работы драйвера.
+<br><span style='color:var(--mute)'>5) </span>FilcalPrinter=ElicomFP
+<li><b>5.</b> 1 Для модели на базе принтера Epson необходимо установить в cantina.ini COMbaudrate=115200
+<br><span style='color:var(--mute)'>6) </span>FilcalPrinter=ElicomECR
+<li><b>6.</b> 1 Скопировать fprwin_en.exe и fprwin_en.ini в отдельную директорию(нарпример, C:\FPRWIN )
+<li><b>6.</b> 2 Прописать путь до fprwin_en.exe в параметре BonDir в cantina.ini
+<li><b>6.</b> 3 Прописать серийный номер кассового аппарата в параметре FiscalDeviceSerialNo в cantina.ini
+<li><b>46.</b> Проверить фискализацию кассовых аппаратов. Для DatecsFP550 это можно сделать при помощи FPTax. Если используются DatecsFP550 и какие-либо ставки НДС для них недоступны(не настроены), то необходимо настроить маппинг символов ставок НДС для таких к.а. в таблице tva_print_letters_mapping:
+<br>id - уникальный номер строки настроек
+<br>id_cassa - значение параметра CassaDatecsNrLogic из cantina.ini соотв. кассового компьютера.
+<br>l_from - символ, который необходимо заменять
+<br>l_to - символ, на который необходимо заменять
+<br>start_date, end_date - время начала и окончания активности данной строки настроек
+<br>Периоды start_date, end_date не должны пересекаться для одних и тех же значений id_cassa, l_from.
+<li><b>47.</b> Проверить печать чеков для каждой из имеющихся ставок НДС на каждом кассовом аппарате.
+<li><b>48.</b> Установить, при необходимости, службу копирования файлов для загрузки в весы - uniaccFileCopy /install. На резервном сервере способ запуска данной службы должен быть "Ручной"("Manual") - при переходе с основного на резервный сервер необходимо запустить эту службу вручную и сменить способ запуска на "Авто".
+<br>Настроить параметры службы:
+<br><span style='color:var(--mute)'>1) </span>SrcPath - откуда копировать
+<br><span style='color:var(--mute)'>2) </span>DestPath - куда копировать
+<br><span style='color:var(--mute)'>3) </span>SecondsInterval - интервал срабатывания
+<br><span style='color:var(--mute)'>4) </span>ReplaceExisting - true/false - флаг замены существующих файлов при перемещении (default=true).
+<br><span style='color:var(--mute)'>5) </span>FlushToDisk - сразу сбрасывать файлы из буфера ОС на диск (по умолчанию включен, можно не настраивать)
+<br><span style='color:var(--mute)'>6) </span>RestartService - включает/отключает перезапуск указанного сервиса (default = false).
+<br><span style='color:var(--mute)'>7) </span>RServiceName -  имя перезапускаемого сервиса (default = "").
+<br>Параметры RestartService и RserviceName используются для перезапуска сервиса QLoadSMD перед началом переноса файлов для загрузи в весы в случае проблем с локальными политиками безопасности и в большинстве случаев не нужны(подробнее о проблеме – Ticket # 20090421105698).
+<br>Необходимо установить для службы учётную запись, котора имеет права на чтение/запись каталога SrcPath, т.к. по умолчанию служба запускается от имени Local System и не имеет доступа в сеть.
+<li><b>49.</b> Установить, в случае использования весов DIGI, службу для загрузки PLU-файлов в весы QLoadSM /install. При пом. конфигуратора настроить службу загрузки (директория, интервал срабатывания, маска файлов, IP-адреса весов). На резервном сервере способ запуска данной службы должен быть "Ручной"("Manual") - при переходе с основного на резервный сервер необходимо запустить эту службу вручную и сменить способ запуска на "Авто".
+<li><b>50.</b> В случае использования весов Mettler Toledo для выгрузки данных на весы используется “Сервер весов” от RTI-Soft (настраивается сотрудниками RTI). В справочнике весов в поле “Тип весов” необходимо выбрать тип 3 (Mettler Toledo) для выгрузки данных в соответствующем формате (необходим также поддерживающий данный тип весов PL/SQL пакет, использующийся для выгрузки).
+<li><b>51.</b> Для загрузки данных в весы EVL используется утилита ETSDriver.exe. Для её работы необходимы также EtsDriver.ini и DIGI.txt.
+<br>В весах должны быть установлены уникальные логические номера. Порядок установки:
+<br><span style='color:var(--mute)'>1) </span>PRG DW PRG
+<br><span style='color:var(--mute)'>2) </span>PRG PRG PRG PRG PRG
+<br><span style='color:var(--mute)'>3) </span>устанавливаем номер
+<br><span style='color:var(--mute)'>4) </span>PRG несколько раз, пока не закончится список параметров (на экране должно появится 0.00)
+<br><span style='color:var(--mute)'>5) </span>Off/On
+<br>В EtsDriver.ini параметры SCALE* используются для указания логических номеров весов    (например SCALE1=1) ,  где первое число – порядковый номер весов в настройке, второе – логический номер, указанный в весах. Параметры FILEDATA* используются для указания имён (возможно указаение полного пути) файлов, которые должны выгружаться в соответствующие весы.
+<br>В справочнике весов для EVL необходимо указывать DIGI в поле “Тип весов”, т.к. форматы выгружаемых файлов для них совпадают.
+<li><b>52.</b> Проверить выгрузку файлов в весы.
+<li><b>53.</b> Очистить PLU-файлы в весах и повторить выгрузку.
+<li><b>54.</b> Настроить параметры для работы с кассовыми весами в случае использования таковых.
+<br>Используемые параметры:
+<br>- ScalesCOM (default = 1, ini/БД, статический) - № COM-порта для работы с весами
+<br>- ScalesCOMBaudRate (default = 9600, ini/БД, статический) - скорость COM-порта для
+<br>работы с весами
+<br>- ScalesDriverLog (default = true, ini/БД, статический) - управляет логированием работы драйвера
+<br>весов
+<br>- IPCServerID (default = "", ini/БД, статический) - задаёт текстовый ID для работы с использованием
+<br>InterProcess Communication (для весов используется un4Scales)
+<br>- ScalesServerPath (default = "", ini/БД, статический) - задаёт путь к утилите, выполняющей роль
+<br>драйвера весов (un4Scales). По умолчанию - "", т.е. в папке с кассовой программой
+<br>Настройки для поддерживаемых моделей весов:
+<br><span style='color:var(--mute)'>1) </span>Metrologic MS2420
+<br>- В папке с программой должны находиться un4Scales.exe и un4s_any.dll
+<br>- параметр IPCServerID = un4Scales
+<br>- параметр ScalesServerPath – не задан, если un4Scales находится в одной папке с UAMenu,
+<br>иначе - путь к un4Scales
+<br>- В un4Scales необходимо указать в качестве используемой DLL  - un4s_any.dll (dll), номер весов
+<br>= номеру COM-порта
+<li><b>55.</b> Настройка POS-терминала.
+<br>- POSTermEnabled (default = false, БД/ ini, статический) - управляет работой с POS-терминалом.
+<br>- POSTermPort (default = 9999, ini/БД, статический) - порт TCP/IP
+<br>- POSTermLog (default = true, ini/БД, статический) -  управляет логированием сообщений с POS-    терминалом.
+<br>- POSTermNoOfCopies (default = 2, ini/БД, статический) - число копий для печати
+<br>- TSPOSShowForm (default = false, ini/БД, статический) – при работе в режиме ТС включает отображение формы для ТС.
+<br>Примечания:
+<br>1* В случае использования VPN-туннелей между бухгалтерской и кассовыми схемами возможны проблемы со стабильностью связи. Эти проблемы могут быть связаны с потенциальным различием максимально допустимых размеров пакета данных на различных участках маршрута (Для VPN-соединений размер пакета меньше, чем для Ethernet-соединений). Симптомы - частые обрывы связи при копировании файлов размером более 1MB, потери связи м/у БД во время обновления больших справочников, что приводит к зависанию обновляющей сессии, которая при этом может ждать до наступления тайм-аута TCP/IP соединения (по умолчанию 2 часа) и удерживать при этом блокировки на справочнике (снимается только через orakill или перезапуск экземпляра). Для устраниения проблем, связанных с размером пакета, необходимо установить на бухгалтерском сервере меньший размер пакета (можно при помощи drTCP).
+<br>Более подробную информацию можно найти по следующим ссылкам:
+<br>http://support.microsoft.com/kb/q140375/
+<br>http://support.microsoft.com/kb/826159
+<br>http://www.dslreports.com/drtcp
+<br>http://www.dslreports.com/faq/578
+<br>http://smallvoid.com/article/winnt-tcpip-mtu.html
+<br>http://www.dslreports.com/faq/5793
+<br>http://support.microsoft.com/kb/Q900926
+<br>http://support.microsoft.com/kb/Q283165
+<br>http://support.microsoft.com/kb/159211/
+<br>http://support.microsoft.com/kb/898060/
+<br>2*  На Win2003 при редактировании файла параметров (cantina.ini) в C:\Windows (и при каждом запуске запуска программы) создаётся локальная копия файла в папке пользователя - \Documents and Settings\USER\Windows и затем используется программой, что создаёт трудности при настройке параметров инициализации, т.к. локальные дубли необходимо не забывать удалять. По этой причине изменён приоритет ini-файлов - больший приоритет будет у ini-файла, находящегося в каталоге программы (в одной папаке с UAMenu.exe). На Win2003 проще будет использовать ini-файл, находящийся в папке с программой, тогда не нужно будет удалять созданные системой дубли после каждого изменения параметра.
+<br>3*  Номер кассы должен быть уникальным для каждой кассы в рамках всей организации. Лучше делать двухуровневым - 2 символа на номер магазина (исключая незначащие нули)
+<br>+ 2 символа на номер кассы в рамках магазина. Также должен быть настроен справочник соответствий  в бухгалтерской схеме.
+<br>Номер кассы может настраиваться двумя разными параметрами – PosID и CassaDatecsNrLogic. Если значение параметра PosID  не задано, вместо него используется п-р CassaDatecsNrLogic (режим обратной совместимости). PosID нужен в случае использования кассовых аппаратов DatecsMP, в таком случае CassaDatecsNrLogic используется только при печати чеков, а для получения номера кассы используется PosID. В остальных случаях вместо PosID может использоваться CassaDatecsNrLogic.
+<br>4* Fast Refresh (copy/paste из заявки 20071221102542 + описание добавленных позже возможностей)
+<br>Краткое описание механизма.
+<br>В бухгалтерской БД создаются materialized view log's для нужных справочников. На кассовых схемах создаются fast refresh materialized view's для базовых справочников, а уже на их основе - view, аналогичные создававшимся при complete refresh. Предыдущий механизм работы со справочниками сохранён практически без изменений. Его можно (и нужно) использовать в случае, когда бухгалтерская и кассовая схемы находятся в одной БД. В таком случае справочники будут использоваться напрямую с бухгалтерской схемы.
+<br>Настройка и переключение между механизмами осуществляется при помощи таблицы object_list. В таблицу добавлены 4 поля:
+<br><span style='color:var(--mute)'>1) </span>fast_refresh - флаг, указывающий механизм обновления, используемый данным справочником. Y - fast, null - complete.
+<br><span style='color:var(--mute)'>2) </span>fr_object_name_buh - по аналогии с object_name_buh – базовый объект бухгалтесркой схемы для данного справочника, используемый при создания fast refresh mv.
+<br><span style='color:var(--mute)'>3) </span>fr_mv_script - шаблон скрипта создания mv (имя объекта и префикс подставляются при создании).
+<br><span style='color:var(--mute)'>4) </span>fr_mv_add_script - шаблон скрипта для создания дополнительных объектов после создания всех mv.
+<br><span style='color:var(--mute)'>5) </span>use_truncate - (для версий &gt;= 10.2). Настройка метода обновления при complete refresh: 'Y' - при complete refresh используется truncate/insert, null - при complete refresh используется delete/insert.
+<br>Для небольших справочников, для которых не реализован fast refresh лучше настраивать use_truncate = null, тогда при обновлении не произойдёт эффекта "пропадания данных" из справочника из-за применения truncate. Т.о., если "тяжёлые" справочники обновляются через fast refresh, а небольшие - complete refresh с настройкой use_truncate = null, то мы получаем согласованное обновление всех справочников.
+<br>В случае использования complete refresh для обновления всех справочников, и "тяжёлых" и небольших, для "тяжёлых" лучше установить use_truncate = true, тогда обновление будет произведено существенно быстрее, т.к. не будет затрачено много времени на очистку больших справочников и будет сгенерировано меньше redo/undo. Но если необходима возможность работы пользователей одновременно с обновлением, то нужно для всех справочников установить use_truncate = null.
+<br><span style='color:var(--mute)'>6) </span>add_script_order - задаёт порядок выполнения скриптов из столбца fr_mv_add_script. (nulls last). Нужно в случае, когда в одном из скриптов используются объекты, создаваемые в другом.
+<br>Пока механизм fast refresh реализован только для "тяжёлых" справочников, полное обновление которых занимало много времени. syss, syssgrp и т.п. обновляются ч/з complete refresh.
+<br>Плюсы:
+<br>- При обновлении справочника затрагиваются только строки, изменённые со времени предыдущего обновления, а не все данные справочника, как при complete refresh. Время обновления зависит от количества изменений, произведённых в бухгалтерской схеме. (При тестировании на резервном сервере
+<br>Линеллы обновление за 1-2 дня происходило за 20-30 секунд на плохом канале связи.) Если никаких изменений в базовых справочниках не было, то вся процедура обновления занимает 2-3 секунды.
+<br>- Поскольку во время обновления не производится truncate справочников, то процедура обновления не мешает работе остальных касс. Можно также сделать, чтобы при запуске обновления из UAMenu создавался job и обновление производилось в фоне, тогда пользователь не будет вынужден ждать окончания процедуры обновления (в таком случае будет нужен лог, в котором можно будет просмотреть результат выполнения обновления, не возникло ли ошибки и т.д.)
+<br>Минусы:
+<br>- Необходимость создания дополнительных объектов в бухгалтерской схеме (materialized view log's).
+<br>- Необходимость мониторинга состояния логов (например, при помощи job'a). Если в момент удаления mv на кассовой схеме связи до бухгалтерской схемы не было, то необходимо производить дерегистрацию mv вручную, чтобы не росли логи. (Наличие такой "неучтёнки" тоже можно отслеживать job'ом).
+<br>- Если во время обновления произошёл сбой связи м/у кассой и бухгалтерией, то, в зависимости от текущей фазы обновления, может потребоваться пересоздание материализованных представлений (Можно сделать из UAMenu - Доплнительные формы -&gt; Настройки -&gt; Новая методика переключения ... -&gt; Кнопка "Создать").
+<br>- Возможно ещё что-нибудь с чем пока не столкнулись...
+<br>На серевере Bomba возникла проблема при использовании fast refresh.
+<br>Описнаие и решение:
+<br>Из-за Bug 5863277 при использовании cursor_sharing=force/similar возникает ошибка ORA-1008 - 'not all variables bound' при обновлении материализованных представлений.
+<br>Doc ID:  Note:472261.1
+<br>Materialized View Refresh Fails on Second Attempt With ORA-01008 'Not All Variables Bound' Error
+<br>Fixed in <ip>
+<br>Т.к. при обновлении materialized view на сервере запускается сессия с module = 'ORACLE.EXE', то можно обойти этот баг, включая cursor_sharing=force только для пользователей BOMBA и CONCERN и module &lt;&gt; 'ORACLE.EXE'.
+<br>Для этого в схеме BOMBA добавлен триггер ybmb_logon_trg с следующими строками:
+<br>if user in ('BOMBA','CONCERN') and sys_context('USERENV','MODULE') &lt;&gt; 'ORACLE.EXE'
+<br>then
+<br>execute immediate 'alter session set cursor_sharing=force';
+<br>end if;
+<br>А на уровне системы cursor_sharing установлен в exact.
+<br>5* Для кассовой схемы можно использовать только Oracle XE c однобайтной кодировкой (не уникодовый Universal). После установки однобайтового Oracle XE кодировка БД по умолчанию –  WE8MSWIN1252 (Western European Latin1). Для изменения кодировки на требуемую CL8MSWIN1251 необходимо выполнить следующие действия:
+<br>shutdown
+<br>startup mount
+<br>alter system enable restricted session;
+<br>alter database open;
+<br>alter database character set internal_use CL8MSWIN1251;
+<br>shutdown
+<br>startup
+<br>Также необходимо проверить, чтобы часть параметра nls_lang, отвечающая за nls_territory, не была усталовлена в CIS (например, RUSSIAN_CIS.CL8MSWIN1251), т.к. в XE это значение устаревшее и подключиться в таком случае будет невозможно. RUSSIAN_CIS.CL8MSWIN1251 можно заменить на RUSSIAN_RUSSIA.CL8MSWIN1251. Параметр может быть задан как в реестре для используемого Oracle_Home, так и в через переменную окружения ОС.
+</ol>
+</div></section>
+<section id="segodnya"><h2>Что изменилось с 2010 года</h2>
+<p>Инструкции пятнадцать лет, и она по-прежнему верна в главном: порядок установки схемы, связей баз и оборудования не поменялся. Ниже то, что за это время разошлось с действительностью. Проверено на рабочей схеме, а не предположено.</p>
+<div class="add"><p class="src">Добавлено к исходной странице</p>
+<h3>Параметров стало на порядок больше</h3>
+<p>Инструкция называет шесть параметров <code>cantina.ini</code>: <code>Server</code>, <code>FiscalPrinter</code>, <code>PosID</code>, <code>CassaDatecsNrLogic</code>, <code>ImageBackGroundPath</code>, <code>BonDir</code>. Сегодня касса читает <b>862</b> параметра. Полный справочник, собранный из самих исходников, — <a href="cantina-ini.md">cantina-ini.md</a>.</p>
+<h3>Приоритет файлов настроек описан верно</h3>
+<p>Примечание 2 говорит, что больший приоритет у файла рядом с <code>UAMenu.exe</code>. Это так и сейчас. Но у самих строк внутри файла есть правило, которого в инструкции нет и на котором ошибаются постоянно: <b>при двух строках с одним именем касса читает первую сверху, а не последнюю</b>. Дописать исправление в конец файла не получится.</p>
+<div class="badbox">В присланном файле рабочей кассы задвоено 22 параметра, и у четырёх значения разные. <code>FiscalPrinter</code> читается как <code>VirtualFP</code>, хотя ниже стоит <code>DatecsFP550</code>. <code>Schema</code> — как <code>bonuspos_self24</code>, хотя ниже дважды <code>pos</code>. <code>Server</code> — как <code>clouddev</code>, хотя ниже <code>casa</code>. <code>CheckPay</code> — как <code>2</code>, хотя ниже <code>0</code>.</div>
+<h3>Появился виртуальный фискальный принтер</h3>
+<p>Инструкция перечисляет Datecs, IKC и Elicom. С тех пор добавился <code>FiscalPrinter=VirtualFP</code>: чек рисуется на экране и в файл, ничего не печатается. Он снимает главное ограничение проверки — печатать стало безопасно. См. <a href="fiscal-emulator.md">fiscal-emulator.md</a>.</p>
+<h3>Шаг 27 стоит делать чаще, чем сказано</h3>
+<p>«Обновить справочники с сервера» — это обновление материализованных представлений. Инструкция упоминает его один раз, при установке. На деле без него касса не увидит ни новых цен, ни новых кнопок: между мастером и кассой стоят материализованные представления, и пока их не обновить, касса рисует прежнее. Права на обновление у схемы кассы есть, и его можно поставить на расписание — <code>DBMS_JOB</code> работает без права <code>CREATE JOB</code>, это проверено.</p>
+<h3>Чего в инструкции нет вовсе</h3>
+<ul class='plain'><li><b>Самообслуживание.</b> 76 параметров киоска, ни одного слова. Разбор — <a href="selfservice-config.md">selfservice-config.md</a>.</li><li><b>Кнопки тачскрина.</b> Устройство панелей, слоёв и команд. Разбор — <a href="wiki-buttons.html">вторая страница</a>.</li><li><b>Лояльность и карты в мобильном кошельке.</b> См. <a href="loyalty-providers.md">loyalty-providers.md</a>.</li><li><b>Обмен с учётной системой.</b> См. <a href="../erp/README.md">erp/README.md</a>.</li></ul>
+</div></section>
+<section id="instrument"><h2>Чем это настраивать сегодня</h2>
+<div class="add"><p class="src">Добавлено к исходной странице</p>
+<p>Править <code>cantina.ini</code> в блокноте больше не обязательно. Утилита настройки показывает у каждого параметра то, чего из файла не видно: читает ли его касса вообще, откуда берётся значение — из файла или из базы, и что будет, если строку убрать.</p>
+<pre><code>python -m cfgtool web        # окно настройки
+python -m cfgtool check      # что в файле не так</code></pre>
+<p>Она же находит то, что инструкция не проверяет: задвоенные строки, строки, отключённые решёткой, и параметры, которых в кассе нет. См. <a href="../cfgtool/README.md">cfgtool/README.md</a>.</p>
+</div></section>
+<footer>Исходная страница: <a href="https://xwiki.una.md/bin/view/UNA/install_conf_serverCassa">https://xwiki.una.md/bin/view/UNA/install_conf_serverCassa</a>. Её текст приведён здесь полностью и не изменён; всё добавленное помечено отдельно. Документ собирается командой <code>python tools/wiki_html.py</code>; исходные тексты лежат в <code>docs/wiki-source/</code>.</footer>
+</div></body></html>
