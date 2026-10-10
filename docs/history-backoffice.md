@@ -56,12 +56,18 @@ SQL. Незакрытые версии (оборванный push) удаляю�
 
 ## Как пользоваться
 
-Один раз, в бэк-офисе (цель с `role = back` и правами `create table,
-sequence, procedure, view`):
+Один раз, в бэк-офисе. Два способа:
 
 ```bash
-python -m frontarchive ini hist-install back
+python -m frontarchive ini hist-install self24 --via-link BONUS2019_07.WORLD   # через линк фронта, пароль бэка не нужен
+python -m frontarchive ini hist-install back                                   # напрямую, цель с role = back
 ```
+
+Первый выполняет каждый DDL как `dbms_utility.exec_ddl_statement@линк`
+под учётной записью линка (обычно это владелец схемы бэк-офиса); нужны
+её права `create table, sequence, procedure, view` — у `BONUS2019_07`
+они есть через роль `RESOURCE`. Так и поставлено в настоящем бэк-офисе
+10.10.2026: 10 объектов, все `VALID`, Oracle 11.2.0.4.
 
 У каждого фронта в `targets.ini`:
 
@@ -109,6 +115,12 @@ begin cantina_ini_hist.purge('BONUSPOS_SELF24', 50); end;         -- остав�
 | `ini hist-diff free-self24 1 3` | ровно две правки |
 | `ini hist-pull free-self24 1` + `fc /b` с оригиналом | **no differences** |
 
-Не проверено: бэк-офис на Oracle 11.2 (стенд — 23ai); разница только в
-`row_number()` в `purge`, который в 11.2 есть. Строки длиннее 4000 байт
-обрезаются (в `cantina.ini` таких нет — максимум около 600).
+Настоящий бэк-офис `BONUS2019_07@clouddev` (Oracle 11.2.0.4), 10.10.2026:
+установка через линк из `bonuspos_self24`, `ini save self24` → версии 1
+(`cantina.ini`, 765 строк) и 2 (`selftest.ini`, 98), повтор — «без
+изменений»; `v_cantina_ini_current` показывает `PosID 101`, `Server
+clouddev`, `FiscalPrinter VirtualFP`; `get_value(last_id(...), 'PosID')`
+через линк = `101`.
+
+Строки длиннее 4000 байт обрезаются (в `cantina.ini` таких нет —
+максимум около 600).
