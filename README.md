@@ -24,6 +24,8 @@
 | Как настроить кассу на стенд и прогнать сценарий без рук | [docs/bench-config.md](docs/bench-config.md), [docs/selftest.md](docs/selftest.md), шаблоны в [templates/](templates/) |
 | Как выглядят настоящие файлы разных точек | [examples/](examples/README.md) — 65 файлов с таблицей «что где» |
 | Править файл не блокнотом | [cfgtool/](cfgtool/README.md) — окно настроек, проверки, редактор кнопок, генератор справочника |
+| Где хранить файл и как вести историю его версий в бэк-офисе | [docs/history-backoffice.md](docs/history-backoffice.md) — три места и их роли, таблицы `CANTINA_INI_VER*` и пакет через DB link, [sql/cantina_ini_hist.sql](sql/cantina_ini_hist.sql) |
+| На Windows Server вместо русских букв `Êîä` и `????????` | [docs/encoding.md](docs/encoding.md) — системная локаль, `NLS_LANG`, проверка; правило кодировки исходников |
 | Старая вики по установке кассы | [docs/wiki-install-cassa.html](docs/wiki-install-cassa.html) |
 
 ## Пять фактов, без которых файл правят неправильно
