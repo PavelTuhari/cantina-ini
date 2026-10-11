@@ -77,5 +77,7 @@ python tools/secrets.py check cantina.ini    # все пометки читаю�
 ## Связанные репозитории
 
 * [uamenu-ai-testbench](https://github.com/PavelTuhari/uamenu-ai-testbench) —
-  развернуть кассу на пустой машине с локальной Oracle Free и снять акт.
+  развернуть кассу на пустой машине с локальной Oracle Free и снять акт;
+  там же [программа полного тестирования](https://github.com/PavelTuhari/uamenu-ai-testbench/blob/main/docs/testing-program/)
+  всех режимов кассы (страница `docs/testing-program.html` с флажками и выгрузкой акта).
 * `uamenu_experimental_ai` (приватный) — исходники кассы, `pypos`, полный `docs/`.
